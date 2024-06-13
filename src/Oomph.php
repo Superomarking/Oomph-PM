@@ -4,7 +4,6 @@ namespace ethaniccc\Oomph;
 
 use ethaniccc\Oomph\event\OomphPunishmentEvent;
 use ethaniccc\Oomph\event\OomphViolationEvent;
-use ethaniccc\Oomph\session\OomphNetworkSession;
 use ethaniccc\Oomph\session\OomphRakLibInterface;
 use ethaniccc\Oomph\session\OomphSession;
 use ethaniccc\Oomph\session\LoggedData;
@@ -12,8 +11,6 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\event\EventPriority;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerCreationEvent;
-use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
@@ -21,7 +18,6 @@ use pocketmine\event\player\PlayerToggleFlightEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\NetworkInterfaceRegisterEvent;
 use pocketmine\network\mcpe\NetworkSession;
-use pocketmine\network\mcpe\PacketRateLimiter;
 use pocketmine\network\mcpe\protocol\PlayerAuthInputPacket;
 use pocketmine\network\mcpe\protocol\ScriptMessagePacket;
 use pocketmine\network\mcpe\protocol\types\PlayerAuthInputFlags;
@@ -32,13 +28,10 @@ use pocketmine\player\PlayerInfo;
 use pocketmine\player\XboxLivePlayerInfo;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\ClosureTask;
-use pocketmine\Server;
 use pocketmine\utils\AssumptionFailedError;
 use pocketmine\utils\TextFormat;
 use ReflectionClass;
 use ReflectionException;
-
-use const pocketmine\BEDROCK_DATA_PATH;
 
 class Oomph extends PluginBase implements Listener {
 
@@ -66,13 +59,10 @@ class Oomph extends PluginBase implements Listener {
 	private array $alerted = [];
 	private ?RakLibInterface $netInterface = null;
 
-	public function onEnable(): void {
-
-		/* if (!str_ends_with(BEDROCK_DATA_PATH, "pocketmine/bedrock-data/")) {
-			$this->getLogger()->emergency("Pocketmine spoons are not supported");
-			$this->getServer()->forceShutdown();
-		} */
-
+    /**
+     * @throws ReflectionException
+     */
+    public function onEnable(): void {
 		self::$instance = $this;
 
 		$this->getServer()->getNetwork()->registerInterface(new OomphRakLibInterface($this->getServer(), $this->getServer()->getIp(), $this->getServer()->getPort(), false)); // do we want upstream connection to use ipv6 (tip: we could load balance by having some upstream connections on ipv4 and some on ipv6)
@@ -243,8 +233,6 @@ class Oomph extends PluginBase implements Listener {
 	 * We do this because for some reason PM doesn't handle it themselves... lmao!
 	 */
 	public function onToggleFlight(PlayerToggleFlightEvent $event): void {
-		$var1 = var_export($event->isFlying(), true);
-		$var2 = var_export($event->getPlayer()->getAllowFlight(), true);
 		if ($event->isFlying() && !$event->getPlayer()->getAllowFlight()) {
 			$event->cancel();
 		}
@@ -316,10 +304,6 @@ class Oomph extends PluginBase implements Listener {
 		OomphSession::register($player);
 	}
 
-	public function onJoin(PlayerJoinEvent $event): void {
-		$player = $event->getPlayer();
-	}
-
 	public function onQuit(PlayerQuitEvent $event): void {
 		OomphSession::unregister($event->getPlayer());
 	}
@@ -328,16 +312,15 @@ class Oomph extends PluginBase implements Listener {
 	 * @priority HIGHEST
 	 * @param DataPacketReceiveEvent $event
 	 * @return void
-	 * @throws ReflectionException'
-	 */
+     */
 	public function onClientPacket(DataPacketReceiveEvent $event): void {
 		$player = $event->getOrigin()->getPlayer();
 		$packet = $event->getPacket();
 
 		// The fact we even have to do this is stupid LMAO.
 		// Remember to notify dylanthecat!!!
-		if ($packet instanceof PlayerAuthInputPacket && $packet->hasFlag(PlayerAuthInputFlags::START_FLYING) && !$player->getAllowFlight()) {
-			$player?->getNetworkSession()->syncAbilities($player);
+		if ($packet instanceof PlayerAuthInputPacket && $packet->hasFlag(PlayerAuthInputFlags::START_FLYING) && !$player?->getAllowFlight()) {
+			$player->getNetworkSession()->syncAbilities($player);
 			return;
 		}
 
@@ -372,7 +355,7 @@ class Oomph extends PluginBase implements Listener {
 				$netRef = new ReflectionClass(NetworkSession::class);
 				$addrArray = explode(":", $data["address"]);
 				if (str_contains($data["address"], "[") && str_contains($data["address"], "]")) {
-					preg_match('#\[(.*?)\]#', $data["address"], $match);
+					preg_match('#\[(.*?)]#', $data["address"], $match);
 					$netRef->getProperty("ip")->setValue($event->getOrigin(), $match[1] ?? "::1");
 				} else {
 					$netRef->getProperty("ip")->setValue($event->getOrigin(), $addrArray[0]);

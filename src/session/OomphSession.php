@@ -55,7 +55,7 @@ class OomphSession {
 
 		try {
 			$this->rateLimiter->decrement();
-		} catch (PacketHandlingException $err) {
+		} catch (PacketHandlingException) {
 			Oomph::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function(): void {
 				$this->player->kick("Exceeded packet rate limit");
 			}), 1);

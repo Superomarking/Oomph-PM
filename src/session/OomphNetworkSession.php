@@ -10,26 +10,20 @@ use pocketmine\network\mcpe\convert\TypeConverter;
 use pocketmine\network\mcpe\encryption\DecryptionException;
 use pocketmine\network\mcpe\EntityEventBroadcaster;
 use pocketmine\network\mcpe\handler\LoginPacketHandler;
-use pocketmine\network\mcpe\handler\SessionStartPacketHandler;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\PacketBroadcaster;
 use pocketmine\network\mcpe\PacketSender;
 use pocketmine\network\mcpe\protocol\PacketDecodeException;
 use pocketmine\network\mcpe\protocol\PacketPool;
 use pocketmine\network\mcpe\protocol\serializer\PacketBatch;
-use pocketmine\network\mcpe\protocol\serializer\PacketSerializerContext;
 use pocketmine\network\NetworkSessionManager;
 use pocketmine\network\PacketHandlingException;
 use pocketmine\player\PlayerInfo;
 use pocketmine\Server;
 use pocketmine\timings\Timings;
-use pocketmine\utils\AssumptionFailedError;
 use pocketmine\utils\BinaryDataException;
 use pocketmine\utils\BinaryStream;
-use pocketmine\utils\ObjectSet;
 use pocketmine\utils\TextFormat;
-use pocketmine\world\Position;
-use pocketmine\YmlServerProperties;
 use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\network\mcpe\protocol\types\CompressionAlgorithm;
 
@@ -37,8 +31,7 @@ class OomphNetworkSession extends NetworkSession {
 
 	private \ReflectionClass $refl;
 
-	private bool $isFirstPacket = true;
-	public function __construct(Server $server, NetworkSessionManager $manager, PacketPool $packetPool, PacketSender $sender, PacketBroadcaster $broadcaster, EntityEventBroadcaster $entityEventBroadcaster,Compressor $compressor, TypeConverter $typeConverter, string $ip, int $port
+    public function __construct(Server $server, NetworkSessionManager $manager, PacketPool $packetPool, PacketSender $sender, PacketBroadcaster $broadcaster, EntityEventBroadcaster $entityEventBroadcaster,Compressor $compressor, TypeConverter $typeConverter, string $ip, int $port
 	) {
 		parent::__construct($server, $manager, $packetPool, $sender, $broadcaster, $entityEventBroadcaster, $compressor, $typeConverter, $ip, $port);
 		$this->refl = new \ReflectionClass(NetworkSession::class);

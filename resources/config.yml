@@ -1,4 +1,4 @@
-Version: "1.0.2"
+Version: "1.0.3"
 Enabled: true
 Allow-NonOomph-Conn: false
 
@@ -18,6 +18,8 @@ NoLogMessage: "{prefix} §aNo logs were found for {player}."
 StartLogMessage: "{prefix} §5Log summary for §d{player}:"
 LogMessage: "§7- §6Detected for §5{check_main}§7<§d{check_sub}§7> §7[§cx{violations}§7]"
 
+# Toggle if the cheater should be punished (kicked/banned), keep this enabled unless debugging
+EnablePunishments: true
 KickMessage: "{prefix} §cKicked for the usage of third-party software."
 BanMessage: "{prefix} §cBanned for the usage of third-party software."
 

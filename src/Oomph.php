@@ -76,7 +76,7 @@ class Oomph extends PluginBase implements Listener {
 			$event->cancel();
 		}, EventPriority::NORMAL, $this);
 
-		if ($this->getConfig()->get("Version", "n/a") !== "1.0.1") {
+		if ($this->getConfig()->get("Version", "n/a") !== "1.0.3") {
 			@unlink($this->getDataFolder() . "config.yml");
 			$this->reloadConfig();
 		}
@@ -413,6 +413,9 @@ class Oomph extends PluginBase implements Listener {
 	}
 
 	private function checkForPunishments(Player $player, string $check, string $type, float $violations): void {
+        if(!$this->getConfig()->get("EnablePunishments")) {
+            return;
+        }
 		$settings = $this->getConfig()->getNested("$check.$type", self::DEFAULT_CHECK_SETTINGS);
 		if (($settings["punishment"] ?? "none") === "none") {
 			return;

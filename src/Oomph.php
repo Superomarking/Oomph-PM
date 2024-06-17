@@ -62,7 +62,7 @@ class Oomph extends PluginBase implements Listener {
     /**
      * @throws ReflectionException
      */
-    public function onEnable(): void {
+	public function onEnable(): void {
 		self::$instance = $this;
 
 		$this->getServer()->getNetwork()->registerInterface(new OomphRakLibInterface($this->getServer(), $this->getServer()->getIp(), $this->getServer()->getPort(), false)); // do we want upstream connection to use ipv6 (tip: we could load balance by having some upstream connections on ipv4 and some on ipv6)
@@ -413,9 +413,9 @@ class Oomph extends PluginBase implements Listener {
 	}
 
 	private function checkForPunishments(Player $player, string $check, string $type, float $violations): void {
-        if(!$this->getConfig()->get("EnablePunishments")) {
-            return;
-        }
+		if(!$this->getConfig()->get("EnablePunishments")) {
+			return;
+		}
 		$settings = $this->getConfig()->getNested("$check.$type", self::DEFAULT_CHECK_SETTINGS);
 		if (($settings["punishment"] ?? "none") === "none") {
 			return;

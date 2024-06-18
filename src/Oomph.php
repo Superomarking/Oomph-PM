@@ -76,7 +76,7 @@ class Oomph extends PluginBase implements Listener {
 			$event->cancel();
 		}, EventPriority::NORMAL, $this);
 
-		if ($this->getConfig()->get("Version", "n/a") !== "1.0.3") {
+		if ($this->getConfig()->get("Version", "n/a") !== "1.0.4") {
 			@unlink($this->getDataFolder() . "config.yml");
 			$this->reloadConfig();
 		}
